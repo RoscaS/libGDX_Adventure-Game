@@ -42,7 +42,8 @@ public class LevelScreen extends BaseScreen {
     public void initialize() {
         TilemapActor tma = new TilemapActor("map.tmx", mainStage);
 
-        for (MapObject obj : tma.getRectangleList(Solid.class.getCanonicalName())) {
+        // solid objects (rocks and fences)
+        for (MapObject obj : tma.getRectangleList("Solid")) {
             MapProperties props = obj.getProperties();
             new Solid(
                     (float) props.get("x"), (float) props.get("y"),
@@ -81,6 +82,11 @@ public class LevelScreen extends BaseScreen {
         MapProperties treasureProps = treasureTile.getProperties();
         treasure = new Treasure((float) treasureProps.get("x"), (float) treasureProps.get("y"), mainStage);
 
+        // Flyers
+        for (MapObject obj : tma.getTileList("Flyer")) {
+            MapProperties props = obj.getProperties();
+            new Flyer((float) props.get("x"), (float) props.get("y"), mainStage);
+        }
 
         // UI
         health = 3;
@@ -135,6 +141,14 @@ public class LevelScreen extends BaseScreen {
 	\*------------------------------------------------------------------*/
 
     @Override
+    public boolean keyDown(int keycode) {
+        if (gameOver) return false;
+        if (keycode == Input.Keys.S) swingSword();
+        if (keycode == Input.Keys.A) shootArrow();
+        return false;
+    }
+
+    @Override
     public void update(float dt) {
 
         if (gameOver) return;
@@ -146,14 +160,65 @@ public class LevelScreen extends BaseScreen {
             if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) hero.accelerateAtAngle(270);
         }
 
+        // collisions
         for (BaseActor solid : BaseActor.getList(mainStage, Solid.class.getCanonicalName())) {
+
+            // hero
             hero.preventOverlap(solid);
+
+            // flyers
+            for (BaseActor flyer : BaseActor.getList(mainStage, Flyer.class.getCanonicalName())) {
+                if (flyer.overlaps(solid)) {
+                    flyer.preventOverlap(solid);
+                    flyer.setMotionAngle(flyer.getMotionAngle() + 180);
+                }
+            }
         }
 
-        // allows sword to destroy bushes
+        // allows sword to destroy some actors
         if (sword.isVisible()) {
+            // bushes
             for (BaseActor bush : BaseActor.getList(mainStage, Bush.class.getCanonicalName())) {
                 if (sword.overlaps(bush)) bush.remove();
+            }
+            // flyer
+            for (BaseActor flyer : BaseActor.getList(mainStage, Flyer.class.getCanonicalName())) {
+                if (sword.overlaps(flyer)) {
+                    killFlyer((Flyer)flyer);
+                }
+            }
+        }
+
+        // arrows can destroy flyers
+        for (BaseActor arrow : BaseActor.getList(mainStage, Arrow.class.getCanonicalName())) {
+            for (BaseActor flyer : BaseActor.getList(mainStage, Flyer.class.getCanonicalName())) {
+                if (arrow.overlaps(flyer)) {
+                    arrow.remove();
+                    killFlyer((Flyer)flyer);
+                }
+            }
+            // arrows are blocked by Solids
+            for (BaseActor solid : BaseActor.getList(mainStage, Solid.class.getCanonicalName())) {
+                if (arrow.overlaps(solid)) {
+                    arrow.preventOverlap(solid);
+                    arrow.setSpeed(0);
+                    arrow.addAction(Actions.fadeOut(10f));
+                    arrow.addAction(Actions.after(Actions.removeActor()));
+                }
+            }
+        }
+
+        // "knockback" prevent hero from overlapping with a Flyer when hitting with his sword
+        for (BaseActor flyer : BaseActor.getList(mainStage, Flyer.class.getCanonicalName())) {
+            if (hero.overlaps(flyer)) {
+                hero.preventOverlap(flyer);
+                flyer.setMotionAngle(flyer.getMotionAngle() + 180);
+                Vector2 heroPosition = new Vector2(hero.getX(), hero.getY());
+                Vector2 flyerPosition = new Vector2(flyer.getX(), flyer.getY());
+                Vector2 hitVector = heroPosition.sub(flyerPosition);
+                hero.setMotionAngle(hitVector.angle());
+                hero.setSpeed(100);
+                health--;
             }
         }
 
@@ -191,11 +256,13 @@ public class LevelScreen extends BaseScreen {
         arrowLabel.setText(" x " + arrows);
     }
 
-    @Override
-    public boolean keyDown(int keycode) {
-        if (gameOver) return false;
-        if (keycode == Input.Keys.S) swingSword();
-        return false;
+
+    public void killFlyer(Flyer flyer) {
+        flyer.remove();
+        Coin coin = new Coin(0, 0, mainStage); // spawn a coin ...
+        coin.centerAtActor(flyer);  // ... over the dead flyer
+        Smoke smoke = new Smoke(0, 0, mainStage); // smoke animation ...
+        smoke.centerAtActor(flyer); // ... over the dying flyer
     }
 
     public void swingSword() {
@@ -234,11 +301,13 @@ public class LevelScreen extends BaseScreen {
             sword.toFront();
     }
 
-	/*------------------------------------------------------------------*\
-	|*							Private Methods 						*|
-	\*------------------------------------------------------------------*/
+    public void shootArrow() {
+        if (arrows <= 0) return;
+        arrows--;
+        Arrow arrow = new Arrow(0, 0, mainStage);
+        arrow.centerAtActor(hero);
+        arrow.setRotation(hero.getFacingAngle());
+        arrow.setMotionAngle(hero.getFacingAngle());
+    }
 
-	/*------------------------------------------------------------------*\
-	|*							Private Attributs 						*|
-	\*------------------------------------------------------------------*/
 }

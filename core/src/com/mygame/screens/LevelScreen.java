@@ -262,7 +262,7 @@ public class LevelScreen extends BaseScreen {
                 if (arrow.overlaps(solid)) {
                     arrow.preventOverlap(solid);
                     arrow.setSpeed(0);
-                    arrow.addAction(Actions.fadeOut(10f));
+                    arrow.addAction(Actions.fadeOut(.5f));
                     arrow.addAction(Actions.after(Actions.removeActor()));
                 }
             }

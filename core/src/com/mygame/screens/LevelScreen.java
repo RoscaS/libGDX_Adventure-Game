@@ -2,22 +2,37 @@ package com.mygame.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.framework.BaseActor;
-import com.framework.BaseScreen;
-import com.framework.TilemapActor;
-import com.mygame.Actors.Bush;
-import com.mygame.Actors.Hero;
-import com.mygame.Actors.Solid;
-import com.mygame.Actors.Sword;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.framework.*;
+import com.mygame.Actors.*;
 
 public class LevelScreen extends BaseScreen {
 
+    // actors
     Hero hero;
     Sword sword;
+    Treasure treasure;
+
+    // values
+    int health;
+    int coins;
+    int arrows;
+
+    // tools
+    boolean gameOver;
+
+    // ui
+    Label healthLabel;
+    Label coinsLabel;
+    Label arrowLabel;
+    Label messageLabel;
+
+    DialogBox dialogBox;
 
 	/*------------------------------------------------------------------*\
 	|*							Initialization							*|
@@ -47,8 +62,68 @@ public class LevelScreen extends BaseScreen {
         // bushes
         for (MapObject obj : tma.getTileList("Bush")) {
             MapProperties props = obj.getProperties();
-            new Bush((float)props.get("x"), (float)props.get("y"), mainStage);
+            new Bush((float) props.get("x"), (float) props.get("y"), mainStage);
         }
+
+        // rock
+        for (MapObject obj : tma.getTileList("Rock")) {
+            MapProperties props = obj.getProperties();
+            new Rock((float) props.get("x"), (float) props.get("y"), mainStage);
+        }
+
+        // coin
+        for (MapObject obj : tma.getTileList("Coin")) {
+            MapProperties props = obj.getProperties();
+            new Coin((float) props.get("x"), (float) props.get("y"), mainStage);
+        }
+        // Treasure
+        MapObject treasureTile = tma.getTileList("Treasure").get(0);
+        MapProperties treasureProps = treasureTile.getProperties();
+        treasure = new Treasure((float) treasureProps.get("x"), (float) treasureProps.get("y"), mainStage);
+
+
+        // UI
+        health = 3;
+        coins = 5;
+        arrows = 3;
+        gameOver = false;
+
+        healthLabel = new Label(" x " + health, BaseGame.labelStyle);
+        healthLabel.setColor(Color.PINK);
+
+        coinsLabel = new Label(" x " + coins, BaseGame.labelStyle);
+        coinsLabel.setColor(Color.GOLD);
+
+        arrowLabel = new Label(" x " + arrows, BaseGame.labelStyle);
+        arrowLabel.setColor(Color.TAN);
+
+        messageLabel = new Label("...", BaseGame.labelStyle);
+        messageLabel.setVisible(false);
+
+
+        BaseActor healthIcon = new BaseActor(0, 0, uiStage);
+        healthIcon.loadTexture("heart-icon.png");
+
+        BaseActor coinIcon = new BaseActor(0, 0, uiStage);
+        coinIcon.loadTexture("coin-icon.png");
+
+        BaseActor arrowIcon = new BaseActor(0, 0, uiStage);
+        arrowIcon.loadTexture("arrow-icon.png");
+
+        uiTable.pad(20);
+        uiTable.add(healthIcon);
+        uiTable.add(healthLabel);
+        uiTable.add().expandX();
+        uiTable.add(coinIcon);
+        uiTable.add(coinsLabel);
+        uiTable.add().expandX();
+        uiTable.add(arrowIcon);
+        uiTable.add(arrowLabel);
+        uiTable.row();
+        uiTable.add(messageLabel).colspan(8).expandX().expandY();
+        uiTable.row();
+        uiTable.add(dialogBox).colspan(8);
+
     }
 
 	/*------------------------------*\
@@ -61,6 +136,8 @@ public class LevelScreen extends BaseScreen {
 
     @Override
     public void update(float dt) {
+
+        if (gameOver) return;
 
         if (!sword.isVisible()) { // can't use the sword if moving
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) hero.accelerateAtAngle(180);
@@ -79,10 +156,44 @@ public class LevelScreen extends BaseScreen {
                 if (sword.overlaps(bush)) bush.remove();
             }
         }
+
+        // gather coin
+        for (BaseActor coin : BaseActor.getList(mainStage, Coin.class.getCanonicalName())) {
+            if (hero.overlaps(coin)) {
+                coin.remove();
+                coins++;
+            }
+        }
+
+        // gather treasure and win
+        if (hero.overlaps(treasure)) {
+            messageLabel.setText("You win !");
+            messageLabel.setColor(Color.LIME);
+            messageLabel.setFontScale(2);
+            messageLabel.setVisible(true);
+            treasure.remove();
+            gameOver = true;
+        }
+
+        // no more life and die
+        if (health <= 0) {
+            messageLabel.setText("Game over...");
+            messageLabel.setColor(Color.RED);
+            messageLabel.setFontScale(2);
+            messageLabel.setVisible(true);
+            hero.remove();
+            gameOver = true;
+        }
+
+        // update ui
+        healthLabel.setText(" x " + health);
+        coinsLabel.setText(" x " + coins);
+        arrowLabel.setText(" x " + arrows);
     }
 
     @Override
     public boolean keyDown(int keycode) {
+        if (gameOver) return false;
         if (keycode == Input.Keys.S) swingSword();
         return false;
     }
@@ -96,25 +207,25 @@ public class LevelScreen extends BaseScreen {
 
         Vector2 offset = new Vector2();
         if (facingAngle == 0)
-            offset.set( 0.50f, 0.20f );
+            offset.set(0.50f, 0.20f);
         else if (facingAngle == 90)
-            offset.set( 0.65f, 0.50f );
+            offset.set(0.65f, 0.50f);
         else if (facingAngle == 180)
-            offset.set( 0.40f, 0.20f );
+            offset.set(0.40f, 0.20f);
         else // facingAngle == 270
-            offset.set( 0.25f, 0.20f );
+            offset.set(0.25f, 0.20f);
 
-        sword.setPosition( hero.getX(), hero.getY() );
-        sword.moveBy( offset.x * hero.getWidth(), offset.y * hero.getHeight() );
+        sword.setPosition(hero.getX(), hero.getY());
+        sword.moveBy(offset.x * hero.getWidth(), offset.y * hero.getHeight());
 
         float swordArc = 90;
         float swordSpeed = .15f;
-        sword.setRotation(facingAngle - swordArc/2);
+        sword.setRotation(facingAngle - swordArc / 2);
         sword.setOriginX(0);
 
         sword.setVisible(true);
-        sword.addAction( Actions.rotateBy(swordArc, swordSpeed) );
-        sword.addAction( Actions.after( Actions.visible(false) ) );
+        sword.addAction(Actions.rotateBy(swordArc, swordSpeed));
+        sword.addAction(Actions.after(Actions.visible(false)));
 
         // hero should appear in front of sword when facing north or west
         if (facingAngle == 90 || facingAngle == 180)

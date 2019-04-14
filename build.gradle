@@ -21,7 +21,7 @@ allprojects {
 
     version = '1.0'
     ext {
-        appName = "boilerplate"
+        appName = "adventuregame"
         gdxVersion = '1.9.9'
         roboVMVersion = '2.3.5'
         box2DLightsVersion = '1.4'

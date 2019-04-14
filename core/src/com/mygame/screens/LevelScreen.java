@@ -21,6 +21,10 @@ public class LevelScreen extends BaseScreen {
     Sword sword;
     Treasure treasure;
 
+    // Shop
+    ShopHeart shopHeart;
+    ShopArrow shopArrow;
+
     // values
     int health;
     int coins;
@@ -47,6 +51,7 @@ public class LevelScreen extends BaseScreen {
         initSolids();
         initHero();
         initActors();
+        initShops();
         initUi();
     }
 
@@ -104,11 +109,20 @@ public class LevelScreen extends BaseScreen {
         for (MapObject obj : tma.getTileList("NPC")) {
             MapProperties props = obj.getProperties();
             NPC npc = new NPC((float) props.get("x"), (float) props.get("y"), mainStage);
-            npc.setId((String)props.get("id"));
-            npc.setText((String)props.get("text"));
+            npc.setId((String) props.get("id"));
+            npc.setText((String) props.get("text"));
         }
     }
 
+    private void initShops() {
+        MapObject shopHeartTile = tma.getTileList("ShopHeart").get(0);
+        MapProperties sHProps = shopHeartTile.getProperties();
+        shopHeart = new ShopHeart((float) sHProps.get("x"), (float) sHProps.get("y"), mainStage);
+
+        MapObject shopArrowTile = tma.getTileList("ShopArrow").get(0);
+        MapProperties sAProps = shopArrowTile.getProperties();
+        shopHeart = new ShopHeart((float) sAProps.get("x"), (float) sAProps.get("y"), mainStage);
+    }
 
     private void initUi() {
         health = 3;
@@ -118,23 +132,25 @@ public class LevelScreen extends BaseScreen {
 
         healthLabel = new Label(" x " + health, BaseGame.labelStyle);
         healthLabel.setColor(Color.PINK);
-
         coinsLabel = new Label(" x " + coins, BaseGame.labelStyle);
         coinsLabel.setColor(Color.GOLD);
-
         arrowLabel = new Label(" x " + arrows, BaseGame.labelStyle);
         arrowLabel.setColor(Color.TAN);
-
         messageLabel = new Label("...", BaseGame.labelStyle);
         messageLabel.setVisible(false);
 
+        dialogBox = new DialogBox(0, 0, uiStage);
+        dialogBox.setBackgroundColor(Color.TAN);
+        dialogBox.setFontColor(Color.BROWN);
+        dialogBox.setDialogSize(600, 100);
+        dialogBox.setFontScale(0.80f);
+        dialogBox.alignCenter();
+        dialogBox.setVisible(false);
 
         BaseActor healthIcon = new BaseActor(0, 0, uiStage);
         healthIcon.loadTexture("heart-icon.png");
-
         BaseActor coinIcon = new BaseActor(0, 0, uiStage);
         coinIcon.loadTexture("coin-icon.png");
-
         BaseActor arrowIcon = new BaseActor(0, 0, uiStage);
         arrowIcon.loadTexture("arrow-icon.png");
 
@@ -162,6 +178,19 @@ public class LevelScreen extends BaseScreen {
         if (gameOver) return false;
         if (keycode == Input.Keys.S) swingSword();
         if (keycode == Input.Keys.A) shootArrow();
+
+        // shop actions
+        if (keycode == Input.Keys.B) {
+            if (hero.overlaps(shopHeart) && coins >= 3) {
+                coins -= 3;
+                health += 1;
+            }
+
+            if (hero.overlaps(shopArrow) && coins >= 4) {
+                coins -= 4;
+                arrows += 3;
+            }
+        }
         return false;
     }
 
@@ -180,6 +209,7 @@ public class LevelScreen extends BaseScreen {
         knockbackMechanic();
         gatherCoin();
         gatherTreasureAndWin();
+        npcDialog();
         checkHealth();
         updateUi();
     }
@@ -290,6 +320,42 @@ public class LevelScreen extends BaseScreen {
         healthLabel.setText(" x " + health);
         coinsLabel.setText(" x " + coins);
         arrowLabel.setText(" x " + arrows);
+    }
+
+    private void npcDialog() {
+        for (BaseActor npcActor : BaseActor.getList(mainStage, NPC.class.getCanonicalName())) {
+            NPC npc = (NPC) npcActor;
+            hero.preventOverlap(npc);
+            boolean nearby = hero.isWithinDistance(4, npc);
+
+            if (nearby && !npc.isViewing()) {
+                // check NPC id for dynamic text
+                if (npc.getId().equals("Gatekeeper")) {
+                    int flyerCount = BaseActor.count(mainStage, Flyer.class.getCanonicalName());
+                    String message = "Destroy the Flyers and the treasure is yours.";
+
+                    if (flyerCount > 1) {
+                        message += " (" + flyerCount + " Flyers)";
+                    } else if (flyerCount == 1) {
+                        message += "Only one Flyer left !";
+                    } else { // flyerCount == 0
+                        message += "The threasure is yours !";
+                        npc.addAction(Actions.fadeOut(5.f));
+                        npc.addAction(Actions.after(Actions.moveBy(-10000, -10000)));
+                    }
+                    dialogBox.setText(message);
+                } else {
+                    dialogBox.setText(npc.getText());
+                }
+                dialogBox.setVisible(true);
+                npc.setViewing(true);
+            }
+            if (npc.isViewing() && !nearby) {
+                dialogBox.setText(" ");
+                dialogBox.setVisible(false);
+                npc.setViewing(false);
+            }
+        }
     }
 
     /*------------------------------*\

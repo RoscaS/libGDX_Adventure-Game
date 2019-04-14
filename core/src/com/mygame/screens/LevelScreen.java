@@ -13,6 +13,9 @@ import com.mygame.Actors.*;
 
 public class LevelScreen extends BaseScreen {
 
+    // Tiled map objects
+    TilemapActor tma;
+
     // actors
     Hero hero;
     Sword sword;
@@ -40,9 +43,14 @@ public class LevelScreen extends BaseScreen {
 
     @Override
     public void initialize() {
-        TilemapActor tma = new TilemapActor("map.tmx", mainStage);
+        tma = new TilemapActor("map.tmx", mainStage);
+        initSolids();
+        initHero();
+        initActors();
+        initUi();
+    }
 
-        // solid objects (rocks and fences)
+    private void initSolids() {
         for (MapObject obj : tma.getRectangleList("Solid")) {
             MapProperties props = obj.getProperties();
             new Solid(
@@ -50,7 +58,9 @@ public class LevelScreen extends BaseScreen {
                     (float) props.get("width"), (float) props.get("height"), mainStage
             );
         }
+    }
 
+    private void initHero() {
         // start point
         MapObject startPoint = tma.getRectangleList("start").get(0);
         MapProperties startProps = startPoint.getProperties();
@@ -59,7 +69,9 @@ public class LevelScreen extends BaseScreen {
         hero = new Hero((float) startProps.get("x"), (float) startProps.get("y"), mainStage);
         sword = new Sword(0, 0, mainStage);
         sword.setVisible(false);
+    }
 
+    private void initActors() {
         // bushes
         for (MapObject obj : tma.getTileList("Bush")) {
             MapProperties props = obj.getProperties();
@@ -88,7 +100,17 @@ public class LevelScreen extends BaseScreen {
             new Flyer((float) props.get("x"), (float) props.get("y"), mainStage);
         }
 
-        // UI
+        // NPCs
+        for (MapObject obj : tma.getTileList("NPC")) {
+            MapProperties props = obj.getProperties();
+            NPC npc = new NPC((float) props.get("x"), (float) props.get("y"), mainStage);
+            npc.setId((String)props.get("id"));
+            npc.setText((String)props.get("text"));
+        }
+    }
+
+
+    private void initUi() {
         health = 3;
         coins = 5;
         arrows = 3;
@@ -129,15 +151,10 @@ public class LevelScreen extends BaseScreen {
         uiTable.add(messageLabel).colspan(8).expandX().expandY();
         uiTable.row();
         uiTable.add(dialogBox).colspan(8);
-
     }
 
-	/*------------------------------*\
-	|*				Getters			*|
-	\*------------------------------*/
-
 	/*------------------------------------------------------------------*\
-	|*							Public Methods 							*|
+	|*							Updating     							*|
 	\*------------------------------------------------------------------*/
 
     @Override
@@ -150,22 +167,34 @@ public class LevelScreen extends BaseScreen {
 
     @Override
     public void update(float dt) {
-
         if (gameOver) return;
 
-        if (!sword.isVisible()) { // can't use the sword if moving
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) hero.accelerateAtAngle(180);
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) hero.accelerateAtAngle(0);
-            if (Gdx.input.isKeyPressed(Input.Keys.UP)) hero.accelerateAtAngle(90);
-            if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) hero.accelerateAtAngle(270);
+        // can't use the sword if moving
+        if (!sword.isVisible()) {
+            pollMovements();
         }
 
-        // collisions
-        for (BaseActor solid : BaseActor.getList(mainStage, Solid.class.getCanonicalName())) {
+        checkCollisions();
+        checkSwordStrike();
+        checkArrowShot();
+        knockbackMechanic();
+        gatherCoin();
+        gatherTreasureAndWin();
+        checkHealth();
+        updateUi();
+    }
 
+    private void pollMovements() {
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) hero.accelerateAtAngle(180);
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) hero.accelerateAtAngle(0);
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) hero.accelerateAtAngle(90);
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) hero.accelerateAtAngle(270);
+    }
+
+    private void checkCollisions() {
+        for (BaseActor solid : BaseActor.getList(mainStage, Solid.class.getCanonicalName())) {
             // hero
             hero.preventOverlap(solid);
-
             // flyers
             for (BaseActor flyer : BaseActor.getList(mainStage, Flyer.class.getCanonicalName())) {
                 if (flyer.overlaps(solid)) {
@@ -174,8 +203,9 @@ public class LevelScreen extends BaseScreen {
                 }
             }
         }
+    }
 
-        // allows sword to destroy some actors
+    private void checkSwordStrike() {
         if (sword.isVisible()) {
             // bushes
             for (BaseActor bush : BaseActor.getList(mainStage, Bush.class.getCanonicalName())) {
@@ -184,17 +214,18 @@ public class LevelScreen extends BaseScreen {
             // flyer
             for (BaseActor flyer : BaseActor.getList(mainStage, Flyer.class.getCanonicalName())) {
                 if (sword.overlaps(flyer)) {
-                    killFlyer((Flyer)flyer);
+                    killFlyer((Flyer) flyer);
                 }
             }
         }
+    }
 
-        // arrows can destroy flyers
+    private void checkArrowShot() {
         for (BaseActor arrow : BaseActor.getList(mainStage, Arrow.class.getCanonicalName())) {
             for (BaseActor flyer : BaseActor.getList(mainStage, Flyer.class.getCanonicalName())) {
                 if (arrow.overlaps(flyer)) {
                     arrow.remove();
-                    killFlyer((Flyer)flyer);
+                    killFlyer((Flyer) flyer);
                 }
             }
             // arrows are blocked by Solids
@@ -207,8 +238,9 @@ public class LevelScreen extends BaseScreen {
                 }
             }
         }
+    }
 
-        // "knockback" prevent hero from overlapping with a Flyer when hitting with his sword
+    private void knockbackMechanic() {
         for (BaseActor flyer : BaseActor.getList(mainStage, Flyer.class.getCanonicalName())) {
             if (hero.overlaps(flyer)) {
                 hero.preventOverlap(flyer);
@@ -221,26 +253,9 @@ public class LevelScreen extends BaseScreen {
                 health--;
             }
         }
+    }
 
-        // gather coin
-        for (BaseActor coin : BaseActor.getList(mainStage, Coin.class.getCanonicalName())) {
-            if (hero.overlaps(coin)) {
-                coin.remove();
-                coins++;
-            }
-        }
-
-        // gather treasure and win
-        if (hero.overlaps(treasure)) {
-            messageLabel.setText("You win !");
-            messageLabel.setColor(Color.LIME);
-            messageLabel.setFontScale(2);
-            messageLabel.setVisible(true);
-            treasure.remove();
-            gameOver = true;
-        }
-
-        // no more life and die
+    private void checkHealth() {
         if (health <= 0) {
             messageLabel.setText("Game over...");
             messageLabel.setColor(Color.RED);
@@ -249,15 +264,39 @@ public class LevelScreen extends BaseScreen {
             hero.remove();
             gameOver = true;
         }
+    }
 
-        // update ui
+    private void gatherCoin() {
+        for (BaseActor coin : BaseActor.getList(mainStage, Coin.class.getCanonicalName())) {
+            if (hero.overlaps(coin)) {
+                coin.remove();
+                coins++;
+            }
+        }
+    }
+
+    private void gatherTreasureAndWin() {
+        if (hero.overlaps(treasure)) {
+            messageLabel.setText("You win !");
+            messageLabel.setColor(Color.LIME);
+            messageLabel.setFontScale(2);
+            messageLabel.setVisible(true);
+            treasure.remove();
+            gameOver = true;
+        }
+    }
+
+    private void updateUi() {
         healthLabel.setText(" x " + health);
         coinsLabel.setText(" x " + coins);
         arrowLabel.setText(" x " + arrows);
     }
 
+    /*------------------------------*\
+   	|*			Complex actions		*|
+   	\*------------------------------*/
 
-    public void killFlyer(Flyer flyer) {
+    private void killFlyer(Flyer flyer) {
         flyer.remove();
         Coin coin = new Coin(0, 0, mainStage); // spawn a coin ...
         coin.centerAtActor(flyer);  // ... over the dead flyer
@@ -265,7 +304,7 @@ public class LevelScreen extends BaseScreen {
         smoke.centerAtActor(flyer); // ... over the dying flyer
     }
 
-    public void swingSword() {
+    private void swingSword() {
         // visibility determines if sword is currently swinging
         if (sword.isVisible()) return;
         hero.setSpeed(0);
@@ -301,7 +340,7 @@ public class LevelScreen extends BaseScreen {
             sword.toFront();
     }
 
-    public void shootArrow() {
+    private void shootArrow() {
         if (arrows <= 0) return;
         arrows--;
         Arrow arrow = new Arrow(0, 0, mainStage);
@@ -309,5 +348,4 @@ public class LevelScreen extends BaseScreen {
         arrow.setRotation(hero.getFacingAngle());
         arrow.setMotionAngle(hero.getFacingAngle());
     }
-
 }

@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3341fc40-20f6-4600-a6d1-dc40cf435d42" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/core/src/com/mygame/Actors/Arrow.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/com/mygame/Actors/Flyer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/com/mygame/Actors/Smoke.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/com/mygame/Actors/NPC.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Java_libGDX_boilerplate.iws" beforeDir="false" afterPath="$PROJECT_DIR$/Java_libGDX_boilerplate.iws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/com/mygame/AdventureGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/com/mygame/AdventureGame.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/com/mygame/screens/LevelScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/com/mygame/screens/LevelScreen.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -85,8 +84,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/core/src/com/mygame/screens/LevelScreen.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="594">
-                  <caret line="122" column="30" lean-forward="true" selection-start-line="122" selection-start-column="30" selection-end-line="122" selection-end-column="30" />
+                <state relative-caret-position="496">
+                  <caret line="160" column="41" lean-forward="true" selection-start-line="160" selection-start-column="41" selection-end-line="160" selection-end-column="41" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -100,6 +99,20 @@
         <splitter split-orientation="vertical" split-proportion="0.80165744">
           <split-first>
             <leaf>
+              <file pinned="false" current-in-tab="true">
+                <entry file="file://$PROJECT_DIR$/core/src/com/mygame/Actors/NPC.java">
+                  <provider selected="true" editor-type-id="text-editor">
+                    <state relative-caret-position="836">
+                      <caret line="42" column="38" selection-start-line="42" selection-start-column="38" selection-end-line="42" selection-end-column="38" />
+                      <folding>
+                        <element signature="imports" expanded="true" />
+                        <element signature="e#1085#1086#0" expanded="true" />
+                        <element signature="e#1110#1111#0" expanded="true" />
+                      </folding>
+                    </state>
+                  </provider>
+                </entry>
+              </file>
               <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/core/src/com/mygame/Actors/Hero.java">
                   <provider selected="true" editor-type-id="text-editor">
@@ -150,7 +163,7 @@
                   </provider>
                 </entry>
               </file>
-              <file pinned="false" current-in-tab="true">
+              <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/core/src/com/mygame/Actors/Arrow.java">
                   <provider selected="true" editor-type-id="text-editor">
                     <state relative-caret-position="396">
@@ -204,18 +217,6 @@
                   </provider>
                 </entry>
               </file>
-              <file pinned="false" current-in-tab="false">
-                <entry file="file://$PROJECT_DIR$/core/src/com/mygame/Actors/Treasure.java">
-                  <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="198">
-                      <caret line="9" column="42" selection-start-line="9" selection-start-column="42" selection-end-line="9" selection-end-column="42" />
-                      <folding>
-                        <element signature="imports" expanded="true" />
-                      </folding>
-                    </state>
-                  </provider>
-                </entry>
-              </file>
             </leaf>
           </split-first>
           <split-second>
@@ -235,8 +236,8 @@
               <file pinned="false" current-in-tab="true">
                 <entry file="file://$PROJECT_DIR$/core/src/com/mygame/AdventureGame.java">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="198">
-                      <caret line="10" column="41" selection-start-line="10" selection-start-column="41" selection-end-line="10" selection-end-column="41" />
+                    <state relative-caret-position="88">
+                      <caret line="4" selection-start-line="4" selection-end-line="4" />
                       <folding>
                         <element signature="imports" expanded="true" />
                       </folding>
@@ -281,7 +282,6 @@
         <option value="$PROJECT_DIR$/core/src/com/framework/TiledMapActor.java" />
         <option value="$PROJECT_DIR$/core/src/com/framework/BaseActor.java" />
         <option value="$PROJECT_DIR$/desktop/src/com/framework/desktop/DesktopLauncher.java" />
-        <option value="$PROJECT_DIR$/core/src/com/mygame/AdventureGame.java" />
         <option value="$PROJECT_DIR$/core/src/com/mygame/Actors/Sworf.java" />
         <option value="$PROJECT_DIR$/core/src/com/mygame/Actors/Solid.java" />
         <option value="$PROJECT_DIR$/core/src/com/mygame/Actors/Bush.java" />
@@ -293,6 +293,9 @@
         <option value="$PROJECT_DIR$/core/src/com/mygame/Actors/Flyer.java" />
         <option value="$PROJECT_DIR$/core/src/com/mygame/Actors/Smoke.java" />
         <option value="$PROJECT_DIR$/core/src/com/mygame/Actors/Arrow.java" />
+        <option value="$PROJECT_DIR$/core/src/com/mygame/AdventureGame.java" />
+        <option value="$PROJECT_DIR$/core/src/com/framework/NPC.java" />
+        <option value="$PROJECT_DIR$/core/src/com/mygame/Actors/NPC.java" />
         <option value="$PROJECT_DIR$/core/src/com/mygame/screens/LevelScreen.java" />
       </list>
     </option>
@@ -509,6 +512,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="extract.method.default.visibility" value="private" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/core/assets" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -623,12 +627,12 @@
       <workItem from="1555187253964" duration="72000" />
       <workItem from="1555187357838" duration="1373000" />
       <workItem from="1555188745971" duration="5192000" />
-      <workItem from="1555237946539" duration="7965000" />
+      <workItem from="1555237946539" duration="9857000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="14602000" />
+    <option name="totallyTimeSpent" value="16494000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1219" y="-24" width="2621" height="2154" extended-state="0" />
@@ -642,7 +646,7 @@
       <window_info id="Favorites" order="5" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32991204" />
-      <window_info anchor="bottom" x="1818" y="587" width="1146" height="412" id="Run" order="2" type="FLOATING" weight="0.13440861" />
+      <window_info anchor="bottom" x="1812" y="509" width="1146" height="412" id="Run" order="2" type="FLOATING" weight="0.13440861" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -729,16 +733,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="249">
           <caret line="22" column="43" selection-start-line="22" selection-start-column="43" selection-end-line="22" selection-end-column="43" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/com/mygame/AdventureGame.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="10" column="41" selection-start-line="10" selection-start-column="41" selection-end-line="10" selection-end-column="41" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -855,10 +849,32 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/com/mygame/AdventureGame.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="88">
+          <caret line="4" selection-start-line="4" selection-end-line="4" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/com/mygame/Actors/NPC.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="836">
+          <caret line="42" column="38" selection-start-line="42" selection-start-column="38" selection-end-line="42" selection-end-column="38" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1085#1086#0" expanded="true" />
+            <element signature="e#1110#1111#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/core/src/com/mygame/screens/LevelScreen.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="594">
-          <caret line="122" column="30" lean-forward="true" selection-start-line="122" selection-start-column="30" selection-end-line="122" selection-end-column="30" />
+        <state relative-caret-position="496">
+          <caret line="160" column="41" lean-forward="true" selection-start-line="160" selection-start-column="41" selection-end-line="160" selection-end-column="41" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

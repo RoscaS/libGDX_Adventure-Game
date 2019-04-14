@@ -49,9 +49,9 @@ public class LevelScreen extends BaseScreen {
     public void initialize() {
         tma = new TilemapActor("map.tmx", mainStage);
         initSolids();
+        initShops();
         initHero();
         initActors();
-        initShops();
         initUi();
     }
 
@@ -116,12 +116,12 @@ public class LevelScreen extends BaseScreen {
 
     private void initShops() {
         MapObject shopHeartTile = tma.getTileList("ShopHeart").get(0);
-        MapProperties sHProps = shopHeartTile.getProperties();
-        shopHeart = new ShopHeart((float) sHProps.get("x"), (float) sHProps.get("y"), mainStage);
+        MapProperties shopHeartProps = shopHeartTile.getProperties();
+        shopHeart = new ShopHeart((float) shopHeartProps.get("x"), (float) shopHeartProps.get("y"), mainStage);
 
         MapObject shopArrowTile = tma.getTileList("ShopArrow").get(0);
-        MapProperties sAProps = shopArrowTile.getProperties();
-        shopHeart = new ShopHeart((float) sAProps.get("x"), (float) sAProps.get("y"), mainStage);
+        MapProperties shopArrowProps = shopArrowTile.getProperties();
+        shopArrow = new ShopArrow((float) shopArrowProps.get("x"), (float) shopArrowProps.get("y"), mainStage);
     }
 
     private void initUi() {
@@ -185,7 +185,6 @@ public class LevelScreen extends BaseScreen {
                 coins -= 3;
                 health += 1;
             }
-
             if (hero.overlaps(shopArrow) && coins >= 4) {
                 coins -= 4;
                 arrows += 3;

@@ -148,7 +148,6 @@ public class TilemapActor extends Actor {
         tiledCamera.position.y = mainCamera.position.y;
         tiledCamera.update();
         tiledMapRenderer.setView(tiledCamera);
-
         // need the following code to force batch order,
         // otherwise it is batched and rendered last.
         batch.end();

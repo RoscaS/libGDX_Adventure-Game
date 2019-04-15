@@ -136,7 +136,7 @@ public abstract class BaseScreen implements Screen, InputProcessor {
     }
 
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        System.out.println("x: " + screenX + "\ty: " + screenY + "\t pointer: " + pointer + "\tbutton: " + button);
+        // System.out.println("x: " + screenX + "\ty: " + screenY + "\t pointer: " + pointer + "\tbutton: " + button);
         return false;
     }
 

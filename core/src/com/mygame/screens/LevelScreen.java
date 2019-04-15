@@ -195,6 +195,7 @@ public class LevelScreen extends BaseScreen {
 
     @Override
     public void update(float dt) {
+
         if (gameOver) return;
 
         // can't use the sword if moving

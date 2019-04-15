@@ -8,9 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.Array;
 
@@ -66,6 +64,18 @@ public class BaseActor extends Group {
         maxSpeed = 1000;
 
         boundaryPolygon = null;
+
+        addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                System.out.println(getClassName() + " \t\t" + positionString());
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
+    }
+
+    public String positionString() {
+        return "x: " + this.getX() + "\ty: " + this.getY();
     }
 
     /*------------------------------------------------------------------*\
@@ -154,6 +164,15 @@ public class BaseActor extends Group {
 	/*------------------------------*\
 	|*				Getters			*|
 	\*------------------------------*/
+
+
+    /**
+     * Return simple class name of this Actor.
+     * @return simple class name
+     */
+    public String getClassName() {
+   	    return this.getClass().getSimpleName();
+       }
 
     /**
      * Calculates the speed of movement (in pixels/second).
@@ -523,6 +542,7 @@ public class BaseActor extends Group {
         float h = getHeight();
         float[] vertices = {0, 0, w, 0, w, h, 0, h};
         boundaryPolygon = new Polygon(vertices);
+
     }
 
     /**
